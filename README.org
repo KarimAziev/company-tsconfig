@@ -1,0 +1,78 @@
+* company-tsconfig
+
+** Requirements
+
++ Emacs >= 27.1
++ company
++ cl-lib
+
+** Installation
+
+*** Manually
+
+Download repository and it to your load path in your init file:
+
+#+begin_src elisp :eval no
+
+(add-to-list 'load-path "/path/to/company-tsconfig")
+
+(defun company-tsconfig-find-file-hook ()
+  "Add company backend to `company-tsconfig' if file is a tsconfig."
+  (require 'company-tsconfig)
+  (require 'company)
+  (when (and buffer-file-name (string-match-p "/tsconfig\\.json$" buffer-file-name))
+    (set (make-local-variable 'company-backends)
+         '(company-tsconfig company-files))
+    (company-mode t)))
+
+(add-hook 'find-file-hook 'company-tsconfig-find-file-hook)
+
+#+end_src
+
+*** With use-package and straight
+
+#+begin_src elisp :eval no
+
+(use-package company-tsconfig
+	:straight (company-tsconfig
+			       :repo "KarimAziev/company-tsconfig"
+			       :type git
+			       :host github)
+  :init :init
+  (defun company-tsconfig-find-file-hook ()
+    "Add company backend to `company-tsconfig' if file is a tsconfig."
+    (require 'company-tsconfig)
+    (require 'company)
+    (when (and buffer-file-name (string-match-p "/tsconfig\\.json$" buffer-file-name))
+      (set (make-local-variable 'company-backends)
+           '(company-tsconfig company-files))
+      (company-mode t)))
+  (add-hook 'find-file-hook 'company-tsconfig-find-file-hook)
+	:commands (company-tsconfig))
+
+#+end_src
+
+** Commands
+
+*** ~company-tsconfig~  (command &optional arg &rest _ignored)
+Begin ~company-mode~ completion backend for tsconfig files. If COMMAND interactive, begin backend ~company-tsconfig~, else return completions for ARG.
+** Functions
+
+*** ~company-tsconfig-json-hook~
+Set ~company-tsconfig~ and ~company-files~ as local company backend.
+*** ~company-tsconfig-bounds-by-chars~  (&optional chars)
+Return bounds of thing at point if it is match CHARS. CHARS is like the inside of a [...] in a regular expression except that ] is never special and quotes ^, - or (but not at the end of a range; quoting is never needed there).
+*** ~company-tsconfig-grab-property~
+Inside string return the word before point, if any.
+*** ~company-tsconfig-property-values~  (attribute)
+Access the ~company-tsconfig-property-alist~ with ATTRIBUTE.
+*** ~company-tsconfig-directory-files~
+Return a list of names of files in DIRECTORY excluding "." and "..". Names are that are relative to the specified directory. If NOSORT is non-nil, the list is not sorted--its order is unpredictable. Otherwise, the list returned is sorted with string-lessp.
+** Variables
+
+*** ~company-tsconfig-property-value-regexp~
+A regular expression matching CSS tags.
+*** ~company-tsconfig-property-re~
+*** ~company-tsconfig-value-classes~
+*** ~company-tsconfig-property-alist~
+A list of tsconfig properties and their possible values.
