@@ -194,11 +194,11 @@
           "\\_>"))
 
 (defvar company-tsconfig-property-value-regexp
-  "\"\\([a-zZ-A]+\\)\":[\s\t\n]+\\([a-zZ-A.]?+\\)"
+  "\"\\([a-z]+\\)\":[\s\t\n]+\\([a-z.]*\\)"
   "A regular expression matching property.")
 
 (defun company-tsconfig-grab-property ()
-  "Inside string return the word before point, if any."
+  "Return the first matching normalized property from the list of all keys."
   (when-let ((prefix (company-grab company-tsconfig-property-value-regexp)))
     (car (member (company-tsconfig-normalize-option prefix)
                  company-tsconfig-all-keys))))
@@ -411,8 +411,9 @@ If COMMAND interactive, begin backend `company-tsconfig',
 else return completions for ARG."
   (interactive (list 'interactive))
   (pcase command
-    ('init (unless company-tsconfig-properties-alist
-             (company-tsconfig-exec-help)))
+    ('init
+     (unless company-tsconfig-properties-alist
+       (company-tsconfig-exec-help)))
     ('interactive (company-begin-backend 'company-tsconfig))
     ('prefix (or
               (company-grab-word)
@@ -455,7 +456,7 @@ else return completions for ARG."
                         (insert "{}")
                         (forward-char -2)
                         (newline-and-indent))))))
-            ((and (looking-back "[a-z][0-9]?+" 0)
+            ((and (looking-back "[a-z][0-9]*" 0)
                   (not (looking-back "false\\|true" 0))
                   (not (nth 3 (syntax-ppss (point)))))
              (when-let* ((bounds (company-tsconfig-bounds-by-chars))
