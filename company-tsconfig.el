@@ -199,7 +199,7 @@
 
 (defun company-tsconfig-grab-property ()
   "Return the first matching normalized property from the list of all keys."
-  (when-let ((prefix (company-grab company-tsconfig-property-value-regexp)))
+  (when-let* ((prefix (company-grab company-tsconfig-property-value-regexp)))
     (car (member (company-tsconfig-normalize-option prefix)
                  company-tsconfig-all-keys))))
 
@@ -259,7 +259,7 @@ Return stdout output if command existed with zero status, nil otherwise."
                (push cell result)))
             ((string-prefix-p "#" line)
              nil)
-            (t (when-let ((cell (pop result)))
+            (t (when-let* ((cell (pop result)))
                  (setcdr cell (append (cdr cell)
                                       (list line)))
                  (push cell result)))))
@@ -272,12 +272,12 @@ Return stdout output if command existed with zero status, nil otherwise."
 
 (defun company-tsconfig-find-description (word)
   "Find annotation for WORD in `company-tsconfig-properties-alist'."
-  (when-let ((description (cdr (assoc word company-tsconfig-properties-alist))))
+  (when-let* ((description (cdr (assoc word company-tsconfig-properties-alist))))
     (string-join description "\s")))
 
 (defun company-tsconfig-find-choices (word)
   "Find completions for WORD."
-  (when-let ((found (cdr (assoc word company-tsconfig-properties-alist))))
+  (when-let* ((found (cdr (assoc word company-tsconfig-properties-alist))))
     (or (when (member "type: boolean" found)
           '("true" "false"))
         (when (member "type: number" found)
@@ -299,7 +299,7 @@ Return stdout output if command existed with zero status, nil otherwise."
 (defun company-tsconfig-goto-string-start ()
   "If point inside string move to the beginning of string."
   (company-tsconfig-with-syntax-table
-   (when-let ((str-start (nth 8 (syntax-ppss
+   (when-let* ((str-start (nth 8 (syntax-ppss
                                  (point)))))
      (goto-char str-start))))
 
@@ -308,13 +308,13 @@ Return stdout output if command existed with zero status, nil otherwise."
 Return new position if changed, nil otherwise."
   (unless n (setq n 1))
   (company-tsconfig-with-syntax-table
-   (when-let ((str-start (nth 8 (syntax-ppss (point)))))
+   (when-let* ((str-start (nth 8 (syntax-ppss (point)))))
      (goto-char str-start))
    (let ((init-pos (point))
          (pos)
          (count n))
      (while (and (not (= count 0))
-                 (when-let ((end (ignore-errors
+                 (when-let* ((end (ignore-errors
                                    (funcall fn)
                                    (point))))
                    (unless (= end (or pos init-pos))
@@ -337,20 +337,20 @@ Return new position if changed, nil otherwise."
         (catch 'found
           (while (company-tsconfig-move-with 'backward-up-list
                                              1)
-            (when-let ((found (company-tsconfig-grab-property)))
+            (when-let* ((found (company-tsconfig-grab-property)))
               (throw 'found found)))))))
 
 (defun company-tsconfig-find-candidates ()
   "Search for tsconfig completions."
-  (when-let ((found (company-tsconfig-find-context)))
+  (when-let* ((found (company-tsconfig-find-context)))
     (if (assoc found company-tsconfig-spec)
         (cadr (assoc found company-tsconfig-spec))
       (company-tsconfig-find-choices found))))
 
 (defun company-tsconfig-exec-help ()
   "Execute tsc help command."
-  (when-let ((tsc-bin (or
-                       (when-let ((located (locate-dominating-file
+  (when-let* ((tsc-bin (or
+                       (when-let* ((located (locate-dominating-file
                                             default-directory
                                             "node_modules/.bin/tsc")))
                          (expand-file-name "node_modules/.bin/tsc" located))
@@ -362,7 +362,7 @@ Return new position if changed, nil otherwise."
 
 (defun company-tsconfig-eldoc-fn ()
   "Return annotation for word at point."
-  (or (when-let ((bounds (company-tsconfig-bounds-by-chars))
+  (or (when-let* ((bounds (company-tsconfig-bounds-by-chars))
                  (word (buffer-substring-no-properties (car bounds)
                                                        (cdr bounds))))
         (setq word (replace-regexp-in-string "[:'\"]+" "" word t))
